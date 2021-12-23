@@ -34,6 +34,8 @@ public abstract class RestartScreen implements Screen {
         switch (key.getKeyCode()) {
             case KeyEvent.VK_ENTER:
                 return new PlayScreen();
+            case KeyEvent.VK_UP:
+                return new ScoreList();
             default:
                 return this;
         }

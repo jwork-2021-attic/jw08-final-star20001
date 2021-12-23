@@ -29,6 +29,7 @@ public class StartScreen extends RestartScreen {
     public Screen displayOutput(AsciiPanel terminal) {
         terminal.write("This is the start screen.", 0, 0);
         terminal.write("Press ENTER to continue...", 0, 1);
+        terminal.write("Press BLANK to find out the player-score list", 0, 2);
         return this;
     }
     

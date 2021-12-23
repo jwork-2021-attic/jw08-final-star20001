@@ -25,9 +25,15 @@ import asciiPanel.AsciiPanel;
  */
 public class WinScreen extends RestartScreen {
 
+    private long score;
+    public WinScreen(long score) {
+        this.score = score;
+    }
     @Override
     public Screen displayOutput(AsciiPanel terminal) {
-        terminal.write("You won! Press enter to go again.", 0, 0);
+        String message = String.format("You win! Your time-cost are %d", score);
+        terminal.write(message, 0, 0);
+        terminal.write("Press ENTER to restart, press BLANK to find out the player-score list", 0, 1);
         return this;
     }
 

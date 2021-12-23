@@ -38,10 +38,14 @@ public class PlayScreen implements Screen {
     private List<String> messages;
     private List<String> oldMessages;
     private boolean isboss;
+    private long startTime;
+    private long score;
 
     public PlayScreen() {
         this.screenWidth = 40;
         this.screenHeight = 21;
+        this.startTime = System.currentTimeMillis();
+        this.score = 0;
         createWorld();
         this.messages = new ArrayList<String>();
         this.oldMessages = new ArrayList<String>();
@@ -49,6 +53,12 @@ public class PlayScreen implements Screen {
 
         CreatureFactory creatureFactory = new CreatureFactory(this.world);
         createCreatures(creatureFactory);
+    }
+
+    public long getScore() {
+        long endTime = System.currentTimeMillis();
+        this.score = (endTime - startTime) / 1000;
+        return score;
     }
 
     private  Creature[] creaturelist;
@@ -118,9 +128,10 @@ public class PlayScreen implements Screen {
         terminal.write(stats, 1, 21);
         if (!isboss) {
             terminal.write(killnumber);
-        }
-        else {
-            terminal.write(warning);
+        } else {
+            if (boss.hp() > 0) {
+                terminal.write(warning);
+            }
         }
         // Messages
         displayMessages(terminal, this.messages);
@@ -129,15 +140,15 @@ public class PlayScreen implements Screen {
             return new LoseScreen();
         }
 
-        if (isboss)
-        {
+        if (isboss) {
             if (boss.hp() <= 0) {
-                return new WinScreen();
+                return new WinScreen(getScore());
             }
         }
         return this;
     }
 
+    
     @Override
     public Screen respondToUserInput(KeyEvent key) {
         switch (key.getKeyCode()) {
