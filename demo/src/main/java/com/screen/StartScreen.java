@@ -29,7 +29,7 @@ public class StartScreen extends RestartScreen {
     public Screen displayOutput(AsciiPanel terminal) {
         terminal.write("This is the start screen.", 0, 0);
         terminal.write("Press ENTER to start a new game.", 0, 1);
-        terminal.write("Press BLANK to continue a game.", 0, 2);
+        terminal.write("Press W to continue a game.", 0, 2);
         return this;
     }
     

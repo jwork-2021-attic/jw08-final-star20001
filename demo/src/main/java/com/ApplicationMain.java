@@ -80,7 +80,6 @@ public class ApplicationMain extends JFrame implements KeyListener {
      */
     public void keyTyped(KeyEvent e) {
     }
-
     public static void main(String[] args) {
         ApplicationMain app = new ApplicationMain();
         app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
