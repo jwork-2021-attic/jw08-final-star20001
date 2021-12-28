@@ -25,6 +25,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import java.io.File;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+
+
 /**
  *
  * @author Aeranythe Echosong
@@ -42,7 +53,7 @@ public class PlayScreen implements Screen {
     private long startTime;
     private long score;
 
-    public PlayScreen() {
+    public PlayScreen(int flag) throws IOException {
         this.screenWidth = 40;
         this.screenHeight = 21;
         this.startTime = System.currentTimeMillis();
@@ -54,6 +65,9 @@ public class PlayScreen implements Screen {
 
         CreatureFactory creatureFactory = new CreatureFactory(this.world);
         createCreatures(creatureFactory);
+        if (flag == 0) {
+            Loadgame();
+        }
     }
 
     public long getScore() {
@@ -149,9 +163,40 @@ public class PlayScreen implements Screen {
         return this;
     }
 
+    private void Savegame() throws IOException {
+        File file = new File("save.txt");
+        BufferedWriter fileout = new BufferedWriter(new FileWriter(file));
+        int[] a = new int[3];
+        a[0] = player.x();
+        a[1] = player.y();
+        a[2] = (int) this.startTime;
+        String line = "";
+        for (int i = 0; i < 3; i++) {
+            line = line + String.valueOf(a[i]) + "\r\n";
+        }
+        fileout.write(line);
+        fileout.close();
+    }
+
+    private void Loadgame() throws IOException {
+        File file = new File("save.txt");
+        FileInputStream fileinput = new FileInputStream(file);
+        InputStreamReader reader = new InputStreamReader(fileinput);
+        BufferedReader br = new BufferedReader(reader);
+        int[] a = new int[3];
+        String line = "";
+        for (int i = 0; i < 3; i++) {
+            line = br.readLine();
+            a[i] = Integer.valueOf(line).intValue();
+        }
+        this.startTime = a[2];
+        player.setX(a[0]);
+        player.setY(a[1]);
+        br.close();
+    }
     
     @Override
-    public Screen respondToUserInput(KeyEvent key) {
+    public Screen respondToUserInput(KeyEvent key) throws IOException {
         switch (key.getKeyCode()) {
         case KeyEvent.VK_LEFT:
             player.moveBy(-1, 0);
@@ -164,6 +209,9 @@ public class PlayScreen implements Screen {
             break;
         case KeyEvent.VK_DOWN:
             player.moveBy(0, 1);
+            break;
+        case KeyEvent.VK_ENTER:
+            Savegame();
             break;
         }
 

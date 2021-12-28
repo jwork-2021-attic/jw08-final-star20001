@@ -19,6 +19,7 @@ package com.screen;
 
 import com.asciiPanel.AsciiPanel;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 
 /**
  *
@@ -33,7 +34,17 @@ public abstract class RestartScreen implements Screen {
     public Screen respondToUserInput(KeyEvent key) {
         switch (key.getKeyCode()) {
             case KeyEvent.VK_ENTER:
-                return new PlayScreen();
+                try {
+                    return new PlayScreen(1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            case KeyEvent.VK_UP:
+                try {
+                    return new PlayScreen(0);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             default:
                 return this;
         }
