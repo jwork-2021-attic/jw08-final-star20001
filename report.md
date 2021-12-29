@@ -3,11 +3,11 @@
 
 学号：202220008
 
-[TOC]
 
 ## 开发目标
 
 我写这个游戏是为了尝试实现课上学到的东西，但因为时间匆忙加自己拖延，所以就没有精进扩展，只为了完成基本内容和练习课上基本知识点。
+
 
 ## 设计理念
 
@@ -66,7 +66,9 @@ UI我选用了jw04的默认UI，只是在怪物选择上面进行了颜色修改
 普通怪物的AI会进行随机走位
 
 ```java
+
 @Override
+
     public void run(){
         while(this.creature.hp()>0){
             try {
@@ -96,7 +98,9 @@ UI我选用了jw04的默认UI，只是在怪物选择上面进行了颜色修改
 boss的ai会主动找寻玩家
 
 ```java
+
  @Override
+
     public void run(){
         while(this.creature.hp()>0){
             try {
@@ -132,6 +136,7 @@ boss的ai会主动找寻玩家
 在主函数部分进行刷屏
 
 ```java
+
  public void keyTyped(KeyEvent e) {
     }
     public static void main(String[] args) {
@@ -158,6 +163,7 @@ boss的ai会主动找寻玩家
 根据jw04的模板，主函数调用一个screen类，一开始是startscreen，然后根据操作返回playscreen。在playscreen中，我调用所有怪物的AI进行更新。
 
 ```java
+
 private  Creature[] creaturelist;
     private void createCreatures(CreatureFactory creatureFactory) {
         this.player = creatureFactory.newPlayer(this.messages);
@@ -178,6 +184,7 @@ private  Creature[] creaturelist;
 在最后通关后进入winscreen，在里面我调用一个客户端client和服务器server进行沟通。
 
 ```java
+
 private void getresult() {
         try {
             Client client = new Client(score);
@@ -192,6 +199,7 @@ private void getresult() {
 client发送现在得分，之后接受server的返回，会返回自己是否是top10中的一个。
 
 ```java
+
 public Client(long score) throws IOException {
         String s = String.valueOf(score);
         byte[] data = s.getBytes();
@@ -209,10 +217,128 @@ public Client(long score) throws IOException {
         socket.close();
     }
 ```
+服务器部分开始时候会先input一下本地的数据，在收到客户端信息后进行比较然后返回排名信息
+
+```java
+
+public static void main(String[] args) throws IOException {
+        
+        DatagramSocket socket = new DatagramSocket(Port);
+        byte[] newscore = new byte[100];
+        DatagramPacket packet = new DatagramPacket(newscore, newscore.length);
+        System.out.println("Waiting");
+        socket.receive(packet);
+        String info = new String(newscore, 0, packet.getLength());
+        long score = Long.parseLong(info);
+        System.out.println(score);
+        byte[] data;
+        if (score < a[0]) {
+            data = "You are NO.1".getBytes();
+        } else {
+            data = "You are not NO.1".getBytes();
+        }
+        InetAddress add = packet.getAddress();
+        int cport = packet.getPort();
+        
+        DatagramPacket packet2 = new DatagramPacket(data, data.length, add, cport);
+        socket.send(packet2);
+        System.out.println("Close");
+        socket.close();
+    }
+```
+
+### 关于保存和加载
+
+保存是在游戏中按下enter即可保存，会在本地写入txt，里面记载了现在的位置信息等。
+
+```java
+
+ private void Savegame() throws IOException {
+        File file = new File("save.txt");
+        BufferedWriter fileout = new BufferedWriter(new FileWriter(file));
+        int[] a = new int[3];
+        a[0] = player.x();
+        a[1] = player.y();
+        a[2] = (int) this.startTime;
+        String line = "";
+        for (int i = 0; i < 3; i++) {
+            line = line + String.valueOf(a[i]) + "\r\n";
+        }
+        fileout.write(line);
+        fileout.close();
+    }
+
+```
+
+加载是在playscreen加入前判断是否有信息要加载。先修改startscreen里面，给playerscreen带参数，要加载了flag设置为0，否则1
+
+playscreen部分
+
+```java
+
+public PlayScreen(int flag) throws IOException {
+        this.screenWidth = 40;
+        this.screenHeight = 21;
+        this.startTime = System.currentTimeMillis();
+        this.score = 0;
+        createWorld();
+        this.messages = new ArrayList<String>();
+        this.oldMessages = new ArrayList<String>();
+        this.isboss = false;
+
+        CreatureFactory creatureFactory = new CreatureFactory(this.world);
+        createCreatures(creatureFactory);
+        if (flag == 0) {
+            Loadgame();
+        }
+    }
+
+    private void Loadgame() throws IOException {
+        File file = new File("save.txt");
+        FileInputStream fileinput = new FileInputStream(file);
+        InputStreamReader reader = new InputStreamReader(fileinput);
+        BufferedReader br = new BufferedReader(reader);
+        int[] a = new int[3];
+        String line = "";
+        for (int i = 0; i < 3; i++) {
+            line = br.readLine();
+            a[i] = Integer.valueOf(line).intValue();
+        }
+        this.startTime = a[2];
+        player.setX(a[0]);
+        player.setY(a[1]);
+        br.close();
+    }
+```
+
+restartscreen部分
+
+```java
+
+@Override
+    public Screen respondToUserInput(KeyEvent key) {
+        switch (key.getKeyCode()) {
+            case KeyEvent.VK_ENTER:
+                try {
+                    return new PlayScreen(1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            case KeyEvent.VK_UP:
+                try {
+                    return new PlayScreen(0);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            default:
+                return this;
+        }
+    }
+```
 
 ## 工程问题
 
-无
+我没学过设计模式啥的，不过按照老师上课讲的java面向对象和范式设计，我尽量让设计的结构有面向对象性质。
 
 ## 一点感受
 
