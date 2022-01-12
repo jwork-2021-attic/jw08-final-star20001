@@ -52,6 +52,7 @@ public class PlayScreen implements Screen {
     private boolean isboss;
     private long startTime;
     private long score;
+    private Creature player2;
 
     public PlayScreen(int flag) throws IOException {
         this.screenWidth = 40;
@@ -76,6 +77,28 @@ public class PlayScreen implements Screen {
         return score;
     }
 
+    public void wirtedown() throws IOException {
+        File file = new File("saveai.txt");
+        BufferedWriter fileout = new BufferedWriter(new FileWriter(file));
+        int[][] a = new int[4][2];
+        for (int i = 0; i < 4; i++) {
+            if (creaturelist[i].hp() > 0) {
+                a[i][0] = creaturelist[i].x();
+                a[i][1] = creaturelist[i].y();
+            } else {
+                a[i][0] = -1;
+                a[i][1] = -1;
+            }
+        }
+        String line = "";
+        for (int i = 0; i < 4; i++) {
+            line = line + String.valueOf(a[i][0]) + "\r\n" + String.valueOf(a[i][1]) + "\r\n";
+        }
+        line = line + String.valueOf(player.x()) + "\r\n" + String.valueOf(player.y()) + "\r\n";
+        fileout.write(line);
+        fileout.close();
+    }
+
     private  Creature[] creaturelist;
     private void createCreatures(CreatureFactory creatureFactory) {
         this.player = creatureFactory.newPlayer(this.messages);
@@ -86,14 +109,39 @@ public class PlayScreen implements Screen {
             Thread t = new Thread(creaturelist[i].getAI());
             t.start();
         }
-
-        
     }
 
     private void createWorld() {
         world = new WorldBuilder(50, 30).makeCaves().build();
     }
 
+   
+
+    private List<String> message2;
+
+    public void setplayer2() {
+        CreatureFactory cf = new CreatureFactory(this.world);
+        this.player2 = cf.newPlayer(this.message2);
+    }
+    
+    public void moveplayer2(String s) {
+        switch (s) {
+            case "W":
+                player2.moveBy(0, -1);
+                break;
+            case "S":
+                player2.moveBy(0, 1);
+                break;
+            case "A":
+                player2.moveBy(-1, 0);
+                break;
+            case "D":
+                player2.moveBy(1, 0);
+                break;
+            default:
+                break;
+        }
+    }
     private void displayTiles(AsciiPanel terminal, int left, int top) {
         // Show terrain
         for (int x = 0; x < screenWidth; x++) {
@@ -118,6 +166,11 @@ public class PlayScreen implements Screen {
             }
         }
         // Creatures can choose their next action now
+        try{
+            wirtedown();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         world.update();
     }
 
