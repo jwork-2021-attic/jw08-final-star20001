@@ -91,6 +91,7 @@ public class NewClient implements Screen{
 
     @Override
     public Screen respondToUserInput(KeyEvent key) throws IOException {
+        
         String s = "";
         switch (key.getKeyCode()) {
             case KeyEvent.VK_LEFT:
@@ -123,7 +124,7 @@ public class NewClient implements Screen{
 
     public void readthetxt() {
         try {
-            File file = new File("saveai.txt");
+            File file = new File("E:\\GITHUB\\jw08-final-star20001\\saveai.txt");
             FileInputStream fileinput = new FileInputStream(file);
             InputStreamReader reader = new InputStreamReader(fileinput);
             BufferedReader br = new BufferedReader(reader);

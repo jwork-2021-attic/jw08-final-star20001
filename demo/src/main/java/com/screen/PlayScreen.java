@@ -186,6 +186,11 @@ public class PlayScreen implements Screen {
     @Override
     public Screen displayOutput(AsciiPanel terminal) {
         // Terrain and creatures
+        try{
+            wirtedown();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         displayTiles(terminal, getScrollX(), getScrollY());
         // Player
         terminal.write(player.glyph(), player.x() - getScrollX(), player.y() - getScrollY(), player.color());
